@@ -10,7 +10,9 @@ exports.run = async (client, message, args) => {
  
 	
   let hm = await db.get("destek"+ message.guild.id)
-  if(!hm) return message.channel.send('Destek Rolü Ayarlamadan Menüyü Göremezsin :D?')
+  if(!hm) return message.channel.send('Destek Rolü Ayarlamadan Menüyü Göremezsin.')
+  let hm2 = await db.get(`log_${message.guild.id}`)
+  if (!hm2) return message.channel.send("Ticket logu ayarlamadan menüyü göremezsin.")
         const row = new ActionRowBuilder()
 			.addComponents(
 				new ButtonBuilder()
