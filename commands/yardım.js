@@ -5,7 +5,7 @@ exports.run = async (client, message, args) => {
 
     const embed = new EmbedBuilder()
     .setTitle("Godzilla - Yardım!")
-    .setDescription(`${prefix}ticket-yetkilisi\n${prefix}ticket-oluştur Buton Üzerinde Yazıcak Yazı + Embed Mesaj Yazısı`)
+    .setDescription(`${prefix}ticket-yetkilisi\n${prefix}ticket-oluştur Buton Üzerinde Yazıcak Yazı + Embed Mesaj Yazısı\n${prefix}ticket-log`)
     .setColor("#007fff")
     .setTimestamp()
     return message.channel.send({embeds : [embed]});
