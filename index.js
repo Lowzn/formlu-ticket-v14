@@ -119,9 +119,11 @@ value: 'delete',
         client.on('interactionCreate', async interaction => {
         if (!interaction.isSelectMenu()) return;
         if(interaction.customId === "del") {
+          let log = db.fetch(`log_${interaction.guild.id}`)
           if (interaction.values[0] == "delete") {
               const channel = interaction.channel
               channel.delete();
+              client.channels.cache.get(log).send(`<@${interaction.user.id}> Adlı Kullanıcı **${interaction.channel.name}** Adlı Desteği Sildi!`)
             
           }
         }
