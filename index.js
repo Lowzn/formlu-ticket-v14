@@ -1,4 +1,4 @@
-const {PermissionsBitField, EmbedBuilder, Client, GatewayIntentBits, ChannelType, Partials, ActionRowBuilder, SelectMenuBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, InteractionType, SelectMenuInteraction } = require("discord.js");
+const {PermissionsBitField, EmbedBuilder, ButtonStyle, Client, GatewayIntentBits, ChannelType, Partials, ActionRowBuilder, SelectMenuBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, InteractionType, SelectMenuInteraction, ButtonBuilder } = require("discord.js");
 const config = require("./config.js");
 const db = require("croxydb")
 const client = new Client({
@@ -58,6 +58,46 @@ client.on('interactionCreate', async (interaction) => {
     await interaction.showModal(modal);
 	}
 })  
+
+const mod = new ModalBuilder()
+.setCustomId('eklemenu')
+.setTitle('Godzilla - Destek Sistemi!')
+  const e = new TextInputBuilder()
+  .setCustomId('uyeid')
+  .setLabel('Kullanıcı ID')
+  .setStyle(TextInputStyle.Paragraph) 
+  .setMinLength(10)
+  .setPlaceholder('Eklemek istediğiniz kullanıcı ID girin.')
+  .setRequired(true)
+  const row2 = new ActionRowBuilder().addComponents(e);
+  
+  mod.addComponents(row2);
+client.on('interactionCreate', async (interaction) => {
+
+	if(interaction.customId === "ekle"){
+    await interaction.showModal(mod);
+	}
+})  
+
+const mod2 = new ModalBuilder()
+.setCustomId('eklemenu2')
+.setTitle('Godzilla - Destek Sistemi!')
+  const a = new TextInputBuilder()
+  .setCustomId('cikarid')
+  .setLabel('Kullanıcı ID')
+  .setStyle(TextInputStyle.Paragraph) 
+  .setMinLength(10)
+  .setPlaceholder('Çıkarmak istediğiniz kullanıcı ID girin.')
+  .setRequired(true)
+  const row3 = new ActionRowBuilder().addComponents(a);
+  
+  mod2.addComponents(row3);
+client.on('interactionCreate', async (interaction) => {
+
+	if(interaction.customId === "çıkar"){
+    await interaction.showModal(mod2);
+	}
+})  
 client.on('interactionCreate', async interaction => {
   if (interaction.type !== InteractionType.ModalSubmit) return;
   if (interaction.customId === 'form') {
@@ -67,13 +107,20 @@ const row = new ActionRowBuilder()
 .addComponents( 
   new SelectMenuBuilder()
   .setCustomId('del')
-.setPlaceholder('Bileti silmek için seçin!')
+.setPlaceholder('Bilet Menüsü!')
 .addOptions([
 {
 label: 'Bileti Sil',
-description: 'Kanalı sil',
+description: 'Kanalı silersin!',
 emoji: "1002538609003470898",
 value: 'delete',
+},
+{
+label: "Panel",
+description: "Üye Ekleme Çıkarma Menüsü.",
+emoji: "984924491777998938",
+value: "panel"
+
 }
 ])
 );
@@ -82,7 +129,6 @@ value: 'delete',
   let roleStaff = interaction.guild.roles.cache.get(data3.rolID)
   let DejaUnChannel = interaction.guild.channels.cache.find(c => c.topic == interaction.user.id)
               if (DejaUnChannel) return interaction.reply({content: 'Sunucuda zaten açık bir biletiniz var.', ephemeral: true})
-              let role = interaction.guild.roles.cache.find(a => a.name === '@everyone')    
               interaction.guild.channels.create({
               name: `ticket-${interaction.user.username}`,
                 type: ChannelType.GuildText,
@@ -117,10 +163,67 @@ value: 'delete',
           }
         })
         client.on('interactionCreate', async interaction => {
+          if (!interaction.isSelectMenu()) return;
+          if(interaction.customId === "del") {
+            if (interaction.values[0] == "panel") {
+              await interaction.deferUpdate()
+const row2 = new ActionRowBuilder()
+.addComponents(
+new ButtonBuilder()
+.setLabel("Ekle")
+.setStyle(ButtonStyle.Success)
+.setCustomId("ekle"),
+new ButtonBuilder()
+.setLabel("Çıkar")
+.setStyle(ButtonStyle.Danger)
+.setCustomId("çıkar"),
+new ButtonBuilder()
+.setLabel("Sil")
+.setStyle(ButtonStyle.Secondary)
+.setCustomId("sil")
+)
+const embed = new EmbedBuilder()
+.setTitle("Godzilla - Kullanıcı Paneli!")
+.setDescription("Aşağıdaki butonlardan üye ekleyebilir veya çıkarabilirsin!")
+.setColor(0x0099ff)
+let message = await interaction.channel.messages.fetch(interaction.message.id)
+await message.edit({embeds: [embed], components: [row2]})
+          }
+        }
+        })
+        client.on('interactionCreate', async interaction => {
+          if (interaction.type !== InteractionType.ModalSubmit) return;
+          if (interaction.customId === 'eklemenu') {
+            const id = interaction.fields.getTextInputValue('uyeid')
+            const channel = interaction.channel
+                channel.permissionOverwrites.create(
+                  id, {ViewChannel: true}
+                  
+                  )
+                  interaction.reply({content: `<@${id}> Adlı Kullanıcı Başarıyla Destek Talebine Eklendi!`})
+                } else {
+                
+          }
+        })
+        client.on('interactionCreate', async interaction => {
+          if (interaction.type !== InteractionType.ModalSubmit) return;
+          if (interaction.customId === 'eklemenu2') {
+            const id = interaction.fields.getTextInputValue('cikarid')
+            const channel = interaction.channel
+                channel.permissionOverwrites.create(
+                  id, {ViewChannel: false}
+                  
+                  )
+                  interaction.reply({content: `<@${id}> Adlı Kullanıcı Başarıyla Destek Talebinden Atıldı!`})
+                } else {
+               
+          }
+        })
+        client.on('interactionCreate', async interaction => {
         if (!interaction.isSelectMenu()) return;
         if(interaction.customId === "del") {
           if (interaction.values[0] == "delete") {
-	      let log = db.fetch(`log_${interaction.guild.id}`)
+            let log = db.fetch(`log_${interaction.guild.id}`)
               const channel = interaction.channel
               channel.delete();
               client.channels.cache.get(log).send(`<@${interaction.user.id}> Adlı Kullanıcı **${interaction.channel.name}** Adlı Desteği Sildi!`)
@@ -128,4 +231,15 @@ value: 'delete',
           }
         }
         })
+        client.on('interactionCreate', async interaction => {
+          if (!interaction.isButton()) return;
+          if(interaction.customId === "sil") {
+              let log = db.fetch(`log_${interaction.guild.id}`)
+                const channel = interaction.channel
+                channel.delete();
+                client.channels.cache.get(log).send(`<@${interaction.user.id}> Adlı Kullanıcı **${interaction.channel.name}** Adlı Desteği Sildi!`)
+              
+            
+          }
+          })
       
