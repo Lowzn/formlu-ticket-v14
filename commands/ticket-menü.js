@@ -3,7 +3,6 @@ const db = require("croxydb")
 const config = require("../config.js")
 const prefix = config.prefix
 exports.run = async (client, message, args) => {
-	if(!message.member.permissions.has("ADMINISTRATOR")) return message.channel.send("Bu komutu kullanabilmek için **Yönetici** yetkisine sahip olman gerekiyor!")
 	let tit = message.content.slice(prefix.length + 'ticket-oluştur'.length);
 	if(!tit.includes("+")) return message.reply("!ticket-oluştur Buton Yazısı + Embed Yazısı")
         let tit2 = tit.split('+');
